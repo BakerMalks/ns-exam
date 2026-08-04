@@ -78,7 +78,7 @@ pytest -s
 
 To Run a subset of the tests by mark:
 ```sh
-pytest -s -m "mark_name"
+pytest -s -m "greenlee"
 ```
 
 To Run a subset of the tests by test function fingerprint:
