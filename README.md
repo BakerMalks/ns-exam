@@ -16,14 +16,14 @@ This project provides emulators for different types of ammeters: Greenlee, ENTES
 - `examples/`
   - `run_test.py`: super lyze example for run test **don't use it**.
 - `src/`
+  - `tests/`
+    - `test_ammeter.py`: test files
   - `testing/`
     - `AmmeterTester.py`: Class to test the ammeter emulators.
   - `utils/`
     - `config.py`: Configuration settings.
     - `logger.py`: Logging setup.
     - `Utils.py`: Utility functions, including `generate_random_float`.
-
-## Usage
 
 # Ammeter Emulators
 
@@ -48,6 +48,8 @@ This project provides emulators for different types of ammeters: Greenlee, ENTES
 - **Measurement Logic**: Calculates current using voltage values (0.1V - 1.0V) over a number of samples and a random time step (0.001s - 0.01s).
 - **Measurement method** : Rogowski Coil Integration: I = ∫V dt
 
+## Usage
+
 To start the virtual environment, run the `setup_env.py` script:
 ```sh
 python setup_env.py
@@ -62,4 +64,40 @@ source .venv/bin/activate
 To start the ammeter emulators and request current measurements, run the `main.py` script:
 ```sh
 python main.py
+```
+
+To run all tests:
+```sh
+pytest
+```
+
+To run all tests and show logs:
+```sh
+pytest -s
+```
+
+To Run a subset of the tests by mark:
+```sh
+pytest -s -m "mark_name"
+```
+
+To Run a subset of the tests by test function fingerprint:
+```sh
+pytest -s -k "test_run_as"
+# will run all the test that has test_run_as in there name. exemple:
+# will run test_run_as_python, aaa_test_run_as_ssaas
+# wont run test_r_un_as
+```
+
+To Run all test in subfolder / file:
+```sh
+pytest -s src\\tests\\test_ammeter.py
+# will run all the test that has test_run_as in there name. exemple:
+# will run test_run_as_python, aaa_test_run_as_ssaas
+# wont run test_r_un_as
+```
+
+To Run a single test:
+```sh
+pytest -s src\\tests\\test_ammeter.py::test_run_as_python
 ```
