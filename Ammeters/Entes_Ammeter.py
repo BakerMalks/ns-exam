@@ -1,8 +1,11 @@
+from typing import ClassVar
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 from src.utils.Utils import generate_random_float
 
 
 class EntesAmmeter(AmmeterEmulatorBase):
+    name: ClassVar[str] = "entes"
+    
     @property
     def get_current_command(self) -> bytes:
         # Define the command to get the current from ENTES
