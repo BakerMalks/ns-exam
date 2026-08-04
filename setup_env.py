@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import venv
 
 # Configuration
@@ -13,12 +14,17 @@ def main():
     builder = venv.EnvBuilder(with_pip=True)
     builder.create(ENV_DIR)
 
+    if sys.platform == "win32":
+        python_executable = os.path.join(ENV_DIR, "Scripts", "python.exe")
+    else:
+        python_executable = os.path.join(ENV_DIR, "bin", "python")
+
     # Install libararies for virtual environment
     if os.path.exists(REQ_FILE):
         print(f"Installing dependencies from {REQ_FILE}...")
         subprocess.run(
             [
-                "python",
+                python_executable,
                 "-m",
                 "pip",
                 "install",
