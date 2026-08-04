@@ -5,6 +5,8 @@ import time
 from threading import Thread
 from typing import Dict
 
+from Ammeters.base_ammeter import AmmeterEmulatorBase
+
 
 def generate_random_float(min_value: float, max_value: float) -> float:
     """Generate a random float between min_value and max_value."""
@@ -12,14 +14,14 @@ def generate_random_float(min_value: float, max_value: float) -> float:
 
 
 class AmmetterManager:
-    def __init__(self, ammeter_configs: Dict[type, Dict]):
+    def __init__(self, ammeter_configs: Dict[str, Dict]):
         self._ammeter_configs = ammeter_configs
         self._running_ammeters = []
 
-    def get(self, ammeter_type: type):
+    def get(self, ammeter_type: type[AmmeterEmulatorBase]):
         """Returns an ammeter instance. Starts server in a thread if not already running."""
 
-        port = self._ammeter_configs[(ammeter_type.name)]["port"]
+        port = self._ammeter_configs[ammeter_type.name]["port"]
         # If already started in this session, return existing details
         if ammeter_type in self._running_ammeters:
             return ammeter_type(port)
