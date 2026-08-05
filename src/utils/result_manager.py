@@ -35,7 +35,7 @@ class SamplerResult:
         self.samples[time.perf_counter() - self._init_time] = value
     
     def print_measurments(self):
-        print(str(self.samples))
+        logging.info(str(self.samples))
     
     @property
     def sample_count(self) -> int:

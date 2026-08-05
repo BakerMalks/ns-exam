@@ -1,3 +1,5 @@
+import logging
+
 from src.testing.test_framework import AmmeterTestFramework
 
 def main():
@@ -9,12 +11,12 @@ def main():
     results = {}
     
     for ammeter_type in ammeter_types:
-        print(f"Testing {ammeter_type} ammeter...")
+        logging.info(f"Testing {ammeter_type} ammeter...")
         results[ammeter_type] = framework.run_test()
         
     # השוואת תוצאות
     for ammeter_type, result in results.items():
-        print(f"\nResults for {ammeter_type}:")
+        logging.info(f"\nResults for {ammeter_type}:")
 
 if __name__ == "__main__":
     main() 

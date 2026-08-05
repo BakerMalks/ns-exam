@@ -1,6 +1,7 @@
 import socket
 import time
 import random
+import logging
 
 from abc import ABC, abstractmethod
 from typing import ClassVar
@@ -22,11 +23,11 @@ class AmmeterEmulatorBase(ABC):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(('localhost', self.port))
             s.listen()
-            print(f"{self.__class__.__name__} is running on port {self.port}")
+            logging.info(f"{self.__class__.__name__} is running on port {self.port}")
             while True:
                 conn, addr = s.accept()
                 with conn:
-                    print(f"Connected by {addr}")
+                    logging.info(f"Connected by {addr}")
                     data = conn.recv(1024)
                     if data == self.get_current_command:
                         # Call the specific measure_current() method defined in subclasses

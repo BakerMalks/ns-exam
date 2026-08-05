@@ -1,3 +1,5 @@
+import logging
+
 from typing import ClassVar
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 from src.utils.Utils import generate_random_float
@@ -16,7 +18,7 @@ class CircutorAmmeter(AmmeterEmulatorBase):
         time_step = generate_random_float(0.001, 0.01)  # Time step (0.001s - 0.01s)
         voltages = [generate_random_float(0.1, 1.0) for _ in range(num_samples)]  # Voltage values
 
-        print(f"CIRCUTOR Ammeter - Voltages: {voltages}, Time Step: {time_step}s")
+        logging.info(f"CIRCUTOR Ammeter - Voltages: {voltages}, Time Step: {time_step}s")
         current = sum(v * time_step for v in voltages)
-        print(f"Current: {current}A")
+        logging.info(f"Current: {current}A")
         return current

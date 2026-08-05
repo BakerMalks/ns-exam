@@ -1,3 +1,5 @@
+import logging
+
 from socket import socket, AF_INET, SOCK_STREAM
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 
@@ -8,7 +10,7 @@ def request_current_from_ammeter(ammeter: AmmeterEmulatorBase, command: bytes):
         s.sendall(command)
         data = s.recv(1024)
         if data:
-            print(f"Received current measurement from port {ammeter.port}: {data.decode('utf-8')} A")
+            logging.info(f"Received current measurement from port {ammeter.port}: {data.decode('utf-8')} A")
         else:
-            print("No data received.")
+            logging.info("No data received.")
 
