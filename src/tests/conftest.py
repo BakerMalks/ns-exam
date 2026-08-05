@@ -3,7 +3,7 @@ import pathlib
 
 from src.utils.config import load_config
 from src.utils.Utils import AmmetterManager
-from src.utils.result_manager import ResultManager
+from src.utils.result_manager import ResultManager, Sampler
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 
 BASE_FOLDER = pathlib.Path(".")
@@ -67,3 +67,16 @@ def ammeter(request, ammeter_manager):
     # Get active ammeter from manager
     active_ammeter = ammeter_manager.get(cls)
     return active_ammeter
+
+
+@pytest.fixture
+def make_sampler(configs):
+    """Factory fixture for creating """
+    sampelin_config = configs["testing"]["sampling"]
+    def _factory(**overrides) -> Sampler:
+        return Sampler(
+            measurements_count=overrides.get(overrides["measurements_count"], sampelin_config["measurements_count"]),
+            total_duration_seconds=overrides.get(overrides["total_duration_seconds"], sampelin_config["total_duration_seconds"]),
+            sampling_frequency_hz=overrides.get(overrides["sampling_frequency_hz"], sampelin_config["sampling_frequency_hz"])
+        )
+    return _factory

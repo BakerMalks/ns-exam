@@ -9,8 +9,11 @@ from logger import logging
 from typing import Any, Dict, List, Union
 from dataclasses import dataclass, field
 
+MAX_SAMPLEING_FREQUENCY = 0.001
+
+
 @dataclass
-class SamplingResult:
+class SamplerResult:
     samples: Dict[float, Any] = field(default_factory=dict)
     initiate_sample_timer: bool = True
     _init_time: float = 0.0
@@ -47,7 +50,7 @@ class SamplingResult:
 
 
 @dataclass
-class NumericSamplingResult(SamplingResult):
+class NumericSamplerResult(SamplerResult):
     samples: Dict[float, float] = field(default_factory=dict)
     
     def max(self) -> float:
@@ -67,34 +70,34 @@ class NumericSamplingResult(SamplingResult):
 
 
 @dataclass
-class Sampling:
-    measurment_count: int = -1  # -1 is dont sample
-    test_duration: float = -1.0  # -1 is dont sample. measurment_count take priority if both set
-    sample_frequency: float = 1000.0  # time in ms between pampeling if multiple samples are needed. 
+class Sampler:
+    measurements_count: int = -1  # -1 is dont sample
+    total_duration_seconds: float = -1.0  # -1 is dont sample. measurements_count take priority if both set
+    sampling_frequency_hz: float = MAX_SAMPLEING_FREQUENCY
 
     def __post_init__(self):
         # frequency must be positive
-        if self.sample_frequency < 1: 
-            self.sample_frequency = 1000.0
+        if self.sampling_frequency_hz < 0: 
+            self.sampling_frequency_hz = MAX_SAMPLEING_FREQUENCY
     
-    def sample(self, sample_function, *args, result_class: type[SamplingResult] = SamplingResult, **kwargs):
+    def sample(self, sample_function, *args, result_class: type[SamplerResult] = SamplerResult, **kwargs):
         samples = result_class()
-        if self.measurment_count >= 0:
+        if self.measurements_count >= 0:
             start_time = time.perf_counter()
-            for _ in range(self.measurment_count):
+            for _ in range(self.measurements_count):
                 time_before_sample = time.perf_counter()
                 samples.add_sample(sample_function(*args, **kwargs))
                 # To ensure precise measurment intervals we sleep remaining time after sample function ends
-                sleep_time = self.sample_frequency - (time.perf_counter() - time_before_sample)
+                sleep_time = self.sampling_frequency_hz - (time.perf_counter() - time_before_sample)
                 time.sleep(max(sleep_time,0))  # if sleep time gets negative
 
-        elif self.test_duration >= 0:
+        elif self.total_duration_seconds >= 0:
             start_time = time.perf_counter()
             # `:=` operator was added in python 3.8
-            while (time_before_sample := time.perf_counter()) < self.test_duration + start_time:
+            while (time_before_sample := time.perf_counter()) < self.total_duration_seconds + start_time:
                 samples.add_sample(sample_function(*args, **kwargs))
                 # To ensure precise measurment intervals we sleep remaining time after sample function ends
-                sleep_time = self.sample_frequency - (time.perf_counter() - time_before_sample)
+                sleep_time = self.sampling_frequency_hz - (time.perf_counter() - time_before_sample)
                 time.sleep(sleep_time)  # if sleep time gets negative
 
         return samples
@@ -110,7 +113,7 @@ class ResultManager:
         else:
             self.folder_path.mkdir()
         
-    def save_result(self, file_name: str, result: SamplingResult, *args, **kwargs):
+    def save_result(self, file_name: str, result: SamplerResult, *args, **kwargs):
         data = result.as_csv(*args, **kwargs)
         self.save_csv(file_name, data)
     
