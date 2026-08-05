@@ -1,12 +1,13 @@
 import time
 import pathlib
 import csv
+import concurrent.futures
 
 import numpy as np
 
 from datetime import datetime
 from logger import logging
-from typing import Any, Callable, Dict, List, TypeVar, Union
+from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
 
 T = TypeVar("T")
@@ -105,6 +106,33 @@ class Sampler:
                 time.sleep(max(sleep_time, 0.0))  # if sleep time gets negative
 
         return samples
+    
+    def sample_many(
+        self,
+        targets: Dict[str, Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]],
+        result_class: Type[SamplerResult] = SamplerResult
+    ) -> Dict[str, SamplerResult]:
+        """
+        Samples multiple functions concurrently using a thread pool.
+        
+        `targets` format: 
+        {
+           "sensor_1": (read_func, (arg1,), {"kwarg1": val}),
+           "sensor_2": (read_func_2, (), {})
+        }
+        """
+        results: Dict[str, SamplerResult] = {}
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(targets)) as executor:
+            future_to_name = {}
+            for name, (func, args, kwargs) in targets.items():
+                future = executor.submit(self.sample, func, *args, result_class=result_class, **kwargs)
+                future_to_name[future] = name
+            for future in concurrent.futures.as_completed(future_to_name):
+                name = future_to_name[future]
+                results[name] = future.result()
+        
+        return results
 
 
 class ResultManager:
