@@ -6,9 +6,10 @@ import numpy as np
 
 from datetime import datetime
 from logger import logging
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, List, TypeVar, Union
 from dataclasses import dataclass, field
 
+T = TypeVar("T")
 MAX_SAMPLEING_FREQUENCY = 0.001
 
 
@@ -80,16 +81,18 @@ class Sampler:
         if self.sampling_frequency_hz < 0: 
             self.sampling_frequency_hz = MAX_SAMPLEING_FREQUENCY
     
-    def sample(self, sample_function, *args, result_class: type[SamplerResult] = SamplerResult, **kwargs):
+    def sample(self, sample_function: Callable[..., T], *args, result_class: type[SamplerResult] = SamplerResult, **kwargs) -> SamplerResult:
         samples = result_class()
+        target_period = 1.0 / self.sampling_frequency_hz
         if self.measurements_count >= 0:
             start_time = time.perf_counter()
             for _ in range(self.measurements_count):
                 time_before_sample = time.perf_counter()
                 samples.add_sample(sample_function(*args, **kwargs))
                 # To ensure precise measurment intervals we sleep remaining time after sample function ends
-                sleep_time = self.sampling_frequency_hz - (time.perf_counter() - time_before_sample)
-                time.sleep(max(sleep_time,0))  # if sleep time gets negative
+                elapsed = time.perf_counter() - time_before_sample
+                sleep_time = target_period - elapsed
+                time.sleep(max(sleep_time, 0.0))  # if sleep time gets negative
 
         elif self.total_duration_seconds >= 0:
             start_time = time.perf_counter()
@@ -97,8 +100,9 @@ class Sampler:
             while (time_before_sample := time.perf_counter()) < self.total_duration_seconds + start_time:
                 samples.add_sample(sample_function(*args, **kwargs))
                 # To ensure precise measurment intervals we sleep remaining time after sample function ends
-                sleep_time = self.sampling_frequency_hz - (time.perf_counter() - time_before_sample)
-                time.sleep(sleep_time)  # if sleep time gets negative
+                elapsed = time.perf_counter() - time_before_sample
+                sleep_time = target_period - elapsed
+                time.sleep(max(sleep_time, 0.0))  # if sleep time gets negative
 
         return samples
 
