@@ -6,7 +6,7 @@ import numpy as np
 
 from datetime import datetime
 from logger import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 from dataclasses import dataclass, field
 
 @dataclass
@@ -101,12 +101,12 @@ class Sampling:
 
 
 class ResultManager:
-    def __init__(self, result_folder_path: str = "."):
+    def __init__(self, result_folder_path: Union[str, pathlib.Path] = "."):  # can also write str | pathlib.Path in ptrhon 3.10+
         now = datetime.now()  # can use utc to avoid multi timezone 
         formatted_time = now.strftime('%Y_%m_%d_%H_%M_%S')
         self.folder_path: pathlib.Path = pathlib.Path(result_folder_path, formatted_time)
         if self.folder_path.exists():
-            pass
+            pass  # maybe add error here
         else:
             self.folder_path.mkdir()
         
@@ -120,5 +120,5 @@ class ResultManager:
         path = path if path.suffix == ".csv" else path.with_suffix(".csv")
         with open(str(path), "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=headers)
-            writer.writeheader()   # Writes the column names
-            writer.writerows(data) # Writes all rows at once
+            writer.writeheader()  # Writes the column names
+            writer.writerows(data)  # Writes all rows at once

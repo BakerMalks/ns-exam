@@ -3,10 +3,13 @@ import pathlib
 
 from src.utils.config import load_config
 from src.utils.Utils import AmmetterManager
+from src.utils.result_manager import ResultManager
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 
-CONFIG_YAML = pathlib.Path("config", "config.yaml")
+BASE_FOLDER = pathlib.Path(".")
+CONFIG_YAML = pathlib.Path(BASE_FOLDER, "config", "config.yaml")
 
+# Session Scope
 
 @pytest.fixture(scope="session")
 def configs():
@@ -32,7 +35,24 @@ def ammeter_manager(configs):
     """
     manager = AmmetterManager(configs["ammeters"])
     yield manager
+    # Close manager
+    pass
 
+
+@pytest.fixture(scope="session")
+def result_manager(configs):
+    result_folder = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"])
+    result_folder.mkdir(exist_ok=True)
+    manager = ResultManager(result_folder)
+    yield manager
+    # Close manager
+    pass
+
+# Module Scope
+
+
+
+# Function Scope
 
 @pytest.fixture
 def ammeter(request, ammeter_manager):
@@ -47,4 +67,3 @@ def ammeter(request, ammeter_manager):
     # Get active ammeter from manager
     active_ammeter = ammeter_manager.get(cls)
     return active_ammeter
-    

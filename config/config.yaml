@@ -22,3 +22,4 @@ analysis:
     plot_types:
 
 result_management:
+  folder_name: Results
