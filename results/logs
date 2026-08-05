@@ -1,0 +1,24 @@
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): EntesAmmeter is running on port 5001
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Connected by ('127.0.0.1', 62220)
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): GreenleeAmmeter is running on port 5000
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Connected by ('127.0.0.1', 62221)
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.03899503936476376T, Calibration Factor: 1931.3951649954556, Current: 75.31483048791219A
+2026-08-05 20:40:10 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 5.134545631827771V, Resistance: 44.820091297975736Ω, Current: 0.11455901768900834A
+2026-08-05 20:40:11 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 9.659472074285246V, Resistance: 15.038923286811984Ω, Current: 0.6422981147031904A
+2026-08-05 20:40:11 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.010860298006235227T, Calibration Factor: 1766.386514312306, Current: 19.18348393962673A
+2026-08-05 20:40:12 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 8.171711236914245V, Resistance: 37.990816427857936Ω, Current: 0.21509701568092876A
+2026-08-05 20:40:12 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.022261709492533983T, Calibration Factor: 1633.3605943390953, Current: 36.361399047729584A
+2026-08-05 20:40:13 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.02751737005326657T, Calibration Factor: 1644.3561181081443, Current: 45.24835580133472A
+2026-08-05 20:40:13 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 5.7341645611606475V, Resistance: 44.274786187816694Ω, Current: 0.12951309435659217A
+2026-08-05 20:40:14 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.06497711323756894T, Calibration Factor: 873.2018750451425, Current: 56.73813711406575A
+2026-08-05 20:40:14 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 1.4809456761284165V, Resistance: 59.011666343577545Ω, Current: 0.025095811860421955A
+2026-08-05 20:40:15 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.04674212682590315T, Calibration Factor: 1967.8917392151388, Current: 91.98344525404116A
+2026-08-05 20:40:15 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 5.650820997180945V, Resistance: 73.99335417638711Ω, Current: 0.07636930451497555A
+2026-08-05 20:40:16 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.05498236270913769T, Calibration Factor: 755.2982958501459, Current: 41.52808485602631A
+2026-08-05 20:40:16 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 7.159290848893679V, Resistance: 6.472365069870634Ω, Current: 1.1061321126987627A
+2026-08-05 20:40:17 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.06325323046268753T, Calibration Factor: 675.4947843348897, Current: 42.72722726987819A
+2026-08-05 20:40:17 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 6.254391391926487V, Resistance: 82.79656032652589Ω, Current: 0.07553926597024031A
+2026-08-05 20:40:18 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.0485662754470556T, Calibration Factor: 1986.7816724389504, Current: 96.49058595683186A
+2026-08-05 20:40:18 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 4.95652910462355V, Resistance: 10.379072395140067Ω, Current: 0.47755029697494084A
+2026-08-05 20:40:19 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): ENTES Ammeter - Magnetic Field: 0.02355270339812815T, Calibration Factor: 1008.9066121310129, Current: 23.76247819193207A
+2026-08-05 20:40:19 INFO (test_ammeters_at_same_time_stability[entes-greenlee-10]): Greenlee Ammeter - Voltage: 7.848940632370186V, Resistance: 70.40736735428166Ω, Current: 0.11147896771761444A

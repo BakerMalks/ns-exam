@@ -1,15 +1,31 @@
 import pytest
 import pathlib
+import logging
 
 from typing import Callable, Dict, List
+from datetime import datetime
 
 from src.utils.config import load_config
 from src.utils.Utils import AmmetterManager
 from src.utils.result_manager import ResultManager, Sampler
+from src.utils.logger import TestNameFilter, TIME_FORMAT
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 
 BASE_FOLDER = pathlib.Path(".")
 CONFIG_YAML = pathlib.Path(BASE_FOLDER, "config", "config.yaml")
+
+
+# Hooks
+
+def pytest_configure(config):
+    configs = load_config(str(CONFIG_YAML))
+    timestamp = datetime.now().strftime(TIME_FORMAT)
+    log_filename = f"pytest_{timestamp}.log"
+    
+    # Set the log file dynamically
+    path = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"], "logs")
+    config.option.log_file = str(pathlib.Path(path, ))
+
 
 # Session Scope
 
@@ -67,6 +83,7 @@ def ammeter(request, ammeter_manager) -> AmmeterEmulatorBase:
     return active_ammeter
 
 
+@pytest.fixture
 def ammeters(request, ammeter_manager) -> List[AmmeterEmulatorBase]:
     """For using ammeter in tests
     Used like:
@@ -96,3 +113,20 @@ def make_sampler(configs) -> Callable[..., Sampler]:
             sampling_frequency_hz=overrides.get("sampling_frequency_hz", sampelin_config["sampling_frequency_hz"])
         )
     return _factory
+
+# Autouse
+
+@pytest.fixture(autouse=True)
+def override_log_name_with_test_name(request):
+    """Overrides record.name with the running test name for ALL log calls."""
+    old_factory = logging.getLogRecordFactory()
+
+    def record_factory(*args, **kwargs):
+        record = old_factory(*args, **kwargs)
+        # Force the name field (%(name)s) to be the pytest test name
+        record.name = request.node.name
+        return record
+
+    logging.setLogRecordFactory(record_factory)
+    yield
+    logging.setLogRecordFactory(old_factory)

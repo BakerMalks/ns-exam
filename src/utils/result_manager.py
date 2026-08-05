@@ -10,6 +10,8 @@ from datetime import datetime
 from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
 
+from src.utils.logger import TIME_FORMAT
+
 T = TypeVar("T")
 MAX_SAMPLEING_FREQUENCY = 0.001
 
@@ -138,7 +140,7 @@ class Sampler:
 class ResultManager:
     def __init__(self, result_folder_path: Union[str, pathlib.Path] = "."):  # can also write str | pathlib.Path in ptrhon 3.10+
         now = datetime.now()  # can use utc to avoid multi timezone 
-        formatted_time = now.strftime('%Y_%m_%d_%H_%M_%S')
+        formatted_time = now.strftime(TIME_FORMAT)
         self.folder_path: pathlib.Path = pathlib.Path(result_folder_path, formatted_time)
         if self.folder_path.exists():
             pass  # maybe add error here
