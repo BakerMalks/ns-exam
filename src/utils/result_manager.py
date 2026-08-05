@@ -1,9 +1,12 @@
 import time
+import pathlib
+import csv
 
 import numpy as np
 
+from datetime import datetime
 from logger import logging
-from typing import Any, Dict
+from typing import Any, Dict, List
 from dataclasses import dataclass, field
 
 @dataclass
@@ -32,6 +35,15 @@ class SamplingResult:
     @property
     def sample_count(self) -> int:
         return len(self.samples)
+    
+    def as_csv(self, sample_colume_name: str = "Sample", use_sample_index: bool = False):
+        data = []
+        index_colume_name = "Index" if use_sample_index else "Time"
+        i = 0
+        for key, value in self.samples.items():
+            data.append({index_colume_name: i if use_sample_index else key, sample_colume_name: value})
+            i += 1
+        return data
 
 
 @dataclass
@@ -86,3 +98,27 @@ class Sampling:
                 time.sleep(sleep_time)  # if sleep time gets negative
 
         return samples
+
+
+class ResultManager:
+    def __init__(self, result_folder_path: str = "."):
+        now = datetime.now()  # can use utc to avoid multi timezone 
+        formatted_time = now.strftime('%Y_%m_%d_%H_%M_%S')
+        self.folder_path: pathlib.Path = pathlib.Path(result_folder_path, formatted_time)
+        if self.folder_path.exists():
+            pass
+        else:
+            self.folder_path.mkdir()
+        
+    def save_result(self, file_name: str, result: SamplingResult, *args, **kwargs):
+        data = result.as_csv(*args, **kwargs)
+        self.save_csv(file_name, data)
+    
+    def save_csv(self, file_name: str, data: List[Dict[float, Any]]):
+        headers = data[0].keys()
+        path = pathlib.Path(self.folder_path, file_name)
+        path = path if path.suffix == ".csv" else path.with_suffix(".csv")
+        with open(str(path), "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()   # Writes the column names
+            writer.writerows(data) # Writes all rows at once
