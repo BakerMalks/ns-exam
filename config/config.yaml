@@ -1,7 +1,7 @@
 testing:
   sampling:
-    measurements_count: 1
-    total_duration_seconds: 1
+    measurements_count: 0  # if lower then 1 will not use
+    total_duration_seconds: 1  # if lower then 0 will not use
     sampling_frequency_hz: 1
 
 ammeters:

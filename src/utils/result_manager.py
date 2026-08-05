@@ -85,7 +85,7 @@ class Sampler:
     def sample(self, sample_function: Callable[..., T], *args, result_class: type[SamplerResult] = SamplerResult, **kwargs) -> SamplerResult:
         samples = result_class()
         target_period = 1.0 / self.sampling_frequency_hz
-        if self.measurements_count >= 0:
+        if self.measurements_count > 0:
             start_time = time.perf_counter()
             for _ in range(self.measurements_count):
                 time_before_sample = time.perf_counter()
@@ -95,7 +95,7 @@ class Sampler:
                 sleep_time = target_period - elapsed
                 time.sleep(max(sleep_time, 0.0))  # if sleep time gets negative
 
-        elif self.total_duration_seconds >= 0:
+        elif self.total_duration_seconds > 0:
             start_time = time.perf_counter()
             # `:=` operator was added in python 3.8
             while (time_before_sample := time.perf_counter()) < self.total_duration_seconds + start_time:
