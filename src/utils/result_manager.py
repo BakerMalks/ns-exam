@@ -2,11 +2,11 @@ import time
 import pathlib
 import csv
 import concurrent.futures
+import logging
 
 import numpy as np
 
 from datetime import datetime
-from logger import logging
 from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
 

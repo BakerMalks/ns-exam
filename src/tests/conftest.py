@@ -91,8 +91,8 @@ def make_sampler(configs) -> Callable[..., Sampler]:
     sampelin_config = configs["testing"]["sampling"]
     def _factory(**overrides) -> Sampler:
         return Sampler(
-            measurements_count=overrides.get(overrides["measurements_count"], sampelin_config["measurements_count"]),
-            total_duration_seconds=overrides.get(overrides["total_duration_seconds"], sampelin_config["total_duration_seconds"]),
-            sampling_frequency_hz=overrides.get(overrides["sampling_frequency_hz"], sampelin_config["sampling_frequency_hz"])
+            measurements_count=overrides.get("measurements_count", sampelin_config["measurements_count"]),
+            total_duration_seconds=overrides.get("total_duration_seconds", sampelin_config["total_duration_seconds"]),
+            sampling_frequency_hz=overrides.get("sampling_frequency_hz", sampelin_config["sampling_frequency_hz"])
         )
     return _factory
