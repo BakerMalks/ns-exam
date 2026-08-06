@@ -17,5 +17,5 @@ class GreenleeAmmeter(AmmeterEmulatorBase):
         voltage = generate_random_float(1.0, 10.0)  # Random voltage (1V - 10V)
         resistance = generate_random_float(0.1, 100.0)  # Random resistance (0.1Ω - 100Ω)
         current = voltage / resistance
-        logging.info(f"Greenlee Ammeter - Voltage: {voltage}V, Resistance: {resistance}Ω, Current: {current}A")
+        logging.debug(f"Greenlee Ammeter - Voltage: {voltage}V, Resistance: {resistance}Ω, Current: {current}A")
         return current
