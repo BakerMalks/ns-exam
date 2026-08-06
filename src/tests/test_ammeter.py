@@ -72,8 +72,8 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     for ammeter_name, res in results.items():
         res.sample_name = ammeter_name
         result_manager.save_result(f"{ammeter_name}Result", res)
-        summaries.append(res.get_summery())
-    result_manager.save_text("summery", "\n\n".join(summaries))
+        summaries.append(res.get_summary())
+    result_manager.save_text("summary", "\n\n".join(summaries))
     
     # Order results
     
@@ -85,5 +85,5 @@ def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager
     res = sampler.sample(ammeter.measure_current, result_class=NumericSamplerResult)
     logging.info(res)
     result_manager.save_result(file_name, res)
-    result_manager.save_text(file_name, res.get_summery())
+    result_manager.save_text(file_name, res.get_summary())
     

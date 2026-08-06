@@ -34,26 +34,26 @@ class SamplerResult:
     def add_sample(self, value):
         self.samples[time.perf_counter() - self._init_time] = value
     
-    def get_summery(self, print_log: bool = True, add_sample_type: bool = True, split_literal: str = "", *args, **kwargs) -> str:
+    def get_summary(self, print_log: bool = True, add_sample_type: bool = True, split_literal: str = "", *args, **kwargs) -> str:
         """Returns a string thet sums up the results of the sample
 
         Args:
-            print_log (bool, optional): Log the summery. Defaults to True.
+            print_log (bool, optional): Log the summary. Defaults to True.
             add_sample_type (bool, optional): Should log the type value of the sample (int / str / ...). Defaults to True.
-            split_literal (str, optional): the split between the summery lines. Defaults "" will mean '\n - '.
+            split_literal (str, optional): the split between the summary lines. Defaults "" will mean '\n - '.
 
         Returns:
             str: _description_
         """
-        summery_list = [self._get_summery_header()]
-        summery_list.extend(self._get_summery_body(add_sample_type))
+        summary_list = [self._get_summary_header()]
+        summary_list.extend(self._get_summary_body(add_sample_type))
         split_literal = split_literal if split_literal else '\n - '
-        summery = split_literal.join(summery_list)
+        summary = split_literal.join(summary_list)
         if print_log:
-            logging.info(summery)
-        return summery
+            logging.info(summary)
+        return summary
         
-    def _get_summery_body(self, add_sample_type: bool = True) -> List[str]:
+    def _get_summary_body(self, add_sample_type: bool = True) -> List[str]:
         body = []
         body.append(f"Sample count: {self.sample_count}")
         if add_sample_type:
@@ -61,7 +61,7 @@ class SamplerResult:
             body.append(f"""Sample types: {", ".join(sample_types)}""")
         return body
             
-    def _get_summery_header(self) -> str:
+    def _get_summary_header(self) -> str:
             return f"""Sample {self.sample_name + " " if self.sample_name else ""}Results:"""
     
     @property
@@ -105,8 +105,8 @@ class NumericSamplerResult(SamplerResult):
         """
         return np.std(list(self.samples.values()), ddof=ddof)
    
-    def _get_summery_body(self, add_sample_type: bool = True) -> List[str]:
-        body = super()._get_summery_body(add_sample_type)
+    def _get_summary_body(self, add_sample_type: bool = True) -> List[str]:
+        body = super()._get_summary_body(add_sample_type)
         body.append(f"Max: {self.max()}")
         body.append(f"Min: {self.min()}")
         body.append(f"Mean: {self.mean()}")
@@ -205,11 +205,11 @@ class ResultManager:
     def reset_sub_folder(self):
         self.sub_folder = "."
         
-    def save_result(self, file_name: str, result: SamplerResult, *args, save_summery=False, **kwargs):
+    def save_result(self, file_name: str, result: SamplerResult, *args, save_summary=False, **kwargs):
         data = result.get_csv(*args, **kwargs)
         self.save_csv(file_name, data)
-        if save_summery:
-            self.save_text(file_name, result.get_summery(print_log=False, *args, **kwargs))
+        if save_summary:
+            self.save_text(file_name, result.get_summary(print_log=False, *args, **kwargs))
     
     def save_csv(self, file_name: str, data: List[Dict[float, Any]]):
         headers = data[0].keys()
