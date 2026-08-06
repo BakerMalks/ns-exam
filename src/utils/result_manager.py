@@ -5,6 +5,9 @@ import concurrent.futures
 import logging
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
 from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -68,14 +71,19 @@ class SamplerResult:
     def sample_count(self) -> int:
         return len(self.samples)
     
-    def get_csv(self, sample_colume_name: str = "Sample", use_sample_index: bool = False, *args, **kwargs):
-        data = []
-        index_colume_name = "Index" if use_sample_index else "Time"
-        i = 0
-        for key, value in self.samples.items():
-            data.append({index_colume_name: i if use_sample_index else key, sample_colume_name: value})
-            i += 1
-        return data
+    def get_csv(self, sample_colume_name: str = "", *args, **kwargs) -> str:
+        return self.get_data_frame(sample_name=sample_colume_name).to_csv()
+
+    def get_data_frame(self, sample_name: str = "", *args, **kwargs) -> pd.DataFrame:
+        sample_name = sample_name if sample_name else (self.sample_name if self.sample_name else "Sample")
+        df = pd.DataFrame(
+            {
+                "Index(I)": list(range(1, self.sample_count + 1)),
+                "Time(s)": list(self.samples.keys()),
+                sample_name: list(self.samples.values())
+            }
+        )
+        return df
 
 
 @dataclass
@@ -206,8 +214,9 @@ class ResultManager:
         self.sub_folder = "."
         
     def save_result(self, file_name: str, result: SamplerResult, *args, save_summary=False, **kwargs):
-        data = result.get_csv(*args, **kwargs)
-        self.save_csv(file_name, data)
+        csv_path = pathlib.Path(self.save_path, file_name)
+        csv_path = csv_path if csv_path.suffix == ".csv" else csv_path.with_suffix(".csv")
+        result.get_data_frame(*args, **kwargs).to_csv(csv_path, index=False)
         if save_summary:
             self.save_text(file_name, result.get_summary(print_log=False, *args, **kwargs))
     
