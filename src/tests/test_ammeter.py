@@ -1,11 +1,10 @@
 import pytest
 import logging
-import time
 
 from typing import Callable
 
 from Ammeters.base_ammeter import AmmeterEmulatorBase
-from src.utils.result_manager import ResultManager, Sampler, SamplerResult, NumericSamplerResult
+from src.utils.result_manager import ResultManager, Sampler, NumericSamplerResult
 from Ammeters.Circutor_Ammeter import CircutorAmmeter
 from Ammeters.Entes_Ammeter import EntesAmmeter
 from Ammeters.Greenlee_Ammeter import GreenleeAmmeter
