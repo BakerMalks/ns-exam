@@ -145,3 +145,13 @@ def override_log_name_with_test_name(request):
     logging.setLogRecordFactory(record_factory)
     yield
     logging.setLogRecordFactory(old_factory)
+
+
+@pytest.fixture(autouse=True)
+def override_result_subfolder_with_test_name(request, result_manager: ResultManager):
+    """Overrides sub_folder name with the running test name of current test"""
+    folder_name = request.node.name.replace("]", "_").replace("[", "_").strip("_")
+
+    result_manager.sub_folder = folder_name
+    yield
+    result_manager.reset_sub_folder()

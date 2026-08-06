@@ -194,12 +194,13 @@ class ResultManager:
     
     @property
     def save_path(self) -> pathlib.Path:
-        return pathlib.Path(self.result_folder_path, self.sub_folder)
+        path = pathlib.Path(self.result_folder_path, self.sub_folder)
+        path.mkdir(exist_ok=True)
+        return path
     
     @sub_folder.setter
     def sub_folder(self, path):
         self._sub_folder = pathlib.Path(path, )
-        self.result_folder_path.mkdir(exist_ok=True)
     
     def reset_sub_folder(self):
         self.sub_folder = "."
