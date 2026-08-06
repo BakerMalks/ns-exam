@@ -77,11 +77,12 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     result_manager.save_text("summary", "\n\n".join(summaries))
     
     # Plot
-    result_manager.plot_results(*results.values(),
-                                title="".join([a.name for a in ammeters]),
-                                kind="scatter",
-                                ylabel="Current[A]")
-    
+    title = " vs ".join([a.name.capitalize() for a in ammeters])
+    value_label = "Current[A]"
+    result_manager.plot_results(*results.values(), title=title, kind="scatter", value_label=value_label)
+    result_manager.plot_results(*results.values(), title=title, kind="line", value_label=value_label)
+    result_manager.plot_results(*results.values(), title=title, kind="hist", value_label=value_label)
+
 
 def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager, make_sampler: Callable[..., Sampler], time_to_run: int, ammeter: AmmeterEmulatorBase):
     # ammeter.measure_current()

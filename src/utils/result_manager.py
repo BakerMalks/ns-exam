@@ -245,7 +245,7 @@ class ResultManager:
                      title: Optional[str] = None,
                      kind: Optional[Literal["line", "scatter", "hist"]] = None,
                      by_index: bool = False, fig_kwargs: Optional[Dict] = None,
-                     ylabel: str = "Value[#]", 
+                     value_label: str = "Value[#]", 
                      show_plot: bool = False,
                      save_plot: bool = True,
                      **kwargs):
@@ -275,20 +275,20 @@ class ResultManager:
         
         # Format axes
         if kind == "hist":
-            ax.set_xlabel(ylabel)
+            ax.set_xlabel(value_label)
             ax.set_ylabel("Count[#]")
         else:
             ax.set_xlabel(col_name)
-            ax.set_ylabel(ylabel)
+            ax.set_ylabel(value_label)
 
-        ax.set_title(f"Overlay {kind.title()} Plot ({title if title else ('Index' if by_index else 'Time')})")
+        ax.set_title(f"Overlay {kind.title()} Plot {title if title else ('Index' if by_index else 'Time')}")
         ax.legend()
         ax.grid(True, which='both')
         fig.tight_layout()
         
         if save_plot: 
             file_name = title.lower().replace(" ", "_") if title else "figure"
-            fig.savefig(pathlib.Path(self.save_path, file_name), bbox_inches="tight")
+            fig.savefig(pathlib.Path(self.save_path, f"{file_name}_{kind}"), bbox_inches="tight")
 
         if show_plot or self._analysis_config.get("visualization", {}).get("enabled", False):
             plt.show()
