@@ -18,8 +18,11 @@ ammeters:
 analysis:
   statistical_metrics:
   visualization:
-    enabled: true
-    plot_types:
+    enabled: false  # will show every plot (stop tests until plot is closed)
+    plot_types: ["line", "scatter", "hist"]
+    default_figure:
+      figure_size: [8, 5]
+      default_plot_type: "line"
 
 result_management:
   folder_name: results

@@ -67,6 +67,8 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     
     # Run Sample
     results = sampler.sample_many(targets, NumericSamplerResult)
+    
+    # Order results
     summaries = []
     for ammeter_name, res in results.items():
         res.sample_name = ammeter_name
@@ -74,7 +76,11 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
         summaries.append(res.get_summary())
     result_manager.save_text("summary", "\n\n".join(summaries))
     
-    # Order results
+    # Plot
+    result_manager.plot_results(*results.values(),
+                                title="".join([a.name for a in ammeters]),
+                                kind="scatter",
+                                ylabel="Current[A]")
     
 
 def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager, make_sampler: Callable[..., Sampler], time_to_run: int, ammeter: AmmeterEmulatorBase):

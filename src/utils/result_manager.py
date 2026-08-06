@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
 
 T = TypeVar("T")
@@ -78,8 +78,8 @@ class SamplerResult:
         sample_name = sample_name if sample_name else (self.sample_name if self.sample_name else "Sample")
         df = pd.DataFrame(
             {
-                "Index(I)": list(range(1, self.sample_count + 1)),
-                "Time(s)": list(self.samples.keys()),
+                "Index[#]": list(range(1, self.sample_count + 1)),
+                "Time[s]": list(self.samples.keys()),
                 sample_name: list(self.samples.values())
             }
         )
@@ -188,8 +188,10 @@ class Sampler:
 
 
 class ResultManager:
-    def __init__(self, result_folder_path: Union[str, pathlib.Path] = "."):  # can also write str | pathlib.Path in ptrhon 3.10+
+    def __init__(self, result_folder_path: Union[str, pathlib.Path] = ".", analysis_config: Optional[Dict] = None):  # can also write str | pathlib.Path in ptrhon 3.10+
         self.result_folder_path: pathlib.Path = pathlib.Path(result_folder_path,)
+        self._analysis_config = analysis_config if analysis_config is not None else {}
+        self._default_figure: Dict = self._analysis_config.get("visualization", {}).get("default_figure", {})
         self._sub_folder: pathlib.Path = pathlib.Path(".",)
         if self.result_folder_path.exists():
             pass  # maybe add error here
@@ -238,3 +240,60 @@ class ResultManager:
             path = path if path.suffix == file_suffix else path.with_suffix(file_suffix)
         with open(str(path), "w", newline="") as f:
             f.write(data)
+
+    def plot_results(self, *results: NumericSamplerResult,
+                     title: Optional[str] = None,
+                     kind: Optional[Literal["line", "scatter", "hist"]] = None,
+                     by_index: bool = False, fig_kwargs: Optional[Dict] = None,
+                     ylabel: str = "Value[#]", 
+                     show_plot: bool = False,
+                     save_plot: bool = True,
+                     **kwargs):
+        # fig
+        fig_kwargs = fig_kwargs if fig_kwargs else (self._default_figure if self._default_figure else {"figsize": [8, 5]})
+        kind = kind if kind else self._default_figure.get("default_plot_type", "scatter")
+        fig, ax = plt.subplots(**fig_kwargs)
+        col_name = ""
+        for i, result in enumerate(results):
+            # kind
+            df = result.get_data_frame(result.sample_name if result.sample_name else f"Sample{i}")
+            
+            x_col = df.columns[0] if by_index else df.columns[1]
+            col_name = x_col
+            y_col = df.columns[2]
+            label_name = df.columns[2]
+
+            # Dynamic plot dispatching on the SAME axis (ax=ax)
+            if kind == "line":
+                sns.lineplot(data=df, x=x_col, y=y_col, label=label_name, ax=ax, **kwargs)
+            elif kind == "scatter":
+                sns.scatterplot(data=df, x=x_col, y=y_col, label=label_name, ax=ax, **kwargs)
+            elif kind == "hist":
+                sns.histplot(data=df, x=y_col, label=label_name, ax=ax, **kwargs)
+            else:
+                raise ValueError(f"Unsupported plot kind '{kind}'. Use 'line', 'scatter', or 'hist'.")
+        
+        # Format axes
+        if kind == "hist":
+            ax.set_xlabel(ylabel)
+            ax.set_ylabel("Count[#]")
+        else:
+            ax.set_xlabel(col_name)
+            ax.set_ylabel(ylabel)
+
+        ax.set_title(f"Overlay {kind.title()} Plot ({title if title else ('Index' if by_index else 'Time')})")
+        ax.legend()
+        ax.grid(True, which='both')
+        fig.tight_layout()
+        
+        if save_plot: 
+            file_name = title.lower().replace(" ", "_") if title else "figure"
+            fig.savefig(pathlib.Path(self.save_path, file_name), bbox_inches="tight")
+
+        if show_plot or self._analysis_config.get("visualization", {}).get("enabled", False):
+            plt.show()
+        else:
+            plt.close(fig)
+
+        return fig, ax
+
