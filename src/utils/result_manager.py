@@ -20,6 +20,7 @@ MAX_SAMPLEING_FREQUENCY = 0.001
 class SamplerResult:
     samples: Dict[float, Any] = field(default_factory=dict)
     initiate_sample_timer: bool = True
+    sample_name: str = ""
     _init_time: float = 0.0
     
     def __post_init__(self):
@@ -36,14 +37,41 @@ class SamplerResult:
     def add_sample(self, value):
         self.samples[time.perf_counter() - self._init_time] = value
     
-    def print_measurments(self):
-        logging.info(str(self.samples))
+    def get_summery(self, print_log: bool = True, add_sample_type: bool = True, split_literal: str = "", *args, **kwargs) -> str:
+        """Returns a string thet sums up the results of the sample
+
+        Args:
+            print_log (bool, optional): Log the summery. Defaults to True.
+            add_sample_type (bool, optional): Should log the type value of the sample (int / str / ...). Defaults to True.
+            split_literal (str, optional): the split between the summery lines. Defaults "" will mean '\n - '.
+
+        Returns:
+            str: _description_
+        """
+        summery_list = [self._get_summery_header()]
+        summery_list.extend(self._get_summery_body(add_sample_type))
+        split_literal = split_literal if split_literal else '\n - '
+        summery = split_literal.join(summery_list)
+        if print_log:
+            logging.info(summery)
+        return summery
+        
+    def _get_summery_body(self, add_sample_type: bool = True) -> List[str]:
+        body = []
+        body.append(f"Sample count: {self.sample_count}")
+        if add_sample_type:
+            sample_types = set(str(type(value)) for value in self.samples.values())
+            body.append(f"""Sample types: {", ".join(sample_types)}""")
+        return body
+            
+    def _get_summery_header(self) -> str:
+            return f"""Sample {self.sample_name + " " if self.sample_name else ""}Results:"""
     
     @property
     def sample_count(self) -> int:
         return len(self.samples)
     
-    def as_csv(self, sample_colume_name: str = "Sample", use_sample_index: bool = False):
+    def get_csv(self, sample_colume_name: str = "Sample", use_sample_index: bool = False, *args, **kwargs):
         data = []
         index_colume_name = "Index" if use_sample_index else "Time"
         i = 0
@@ -70,8 +98,25 @@ class NumericSamplerResult(SamplerResult):
         return list(self.samples.values())[self.sample_count // 2]
 
     def std(self, ddof: float = 0) -> float:
-       return np.std(list(self.samples.values()), ddof=ddof)
+        """Standard deviation 
 
+        Args:
+            ddof (float, optional): Means Delta Degrees of Freedom. The divisor used in calculations is N - ddof, where N represents the number of elements. Defaults to 0.
+
+        Returns:
+            float: standard deviation
+        """
+        return np.std(list(self.samples.values()), ddof=ddof)
+   
+    def _get_summery_body(self, add_sample_type: bool = True) -> List[str]:
+        body = super()._get_summery_body(add_sample_type)
+        body.append(f"Max: {self.max()}")
+        body.append(f"Min: {self.min()}")
+        body.append(f"Mean: {self.mean()}")
+        body.append(f"Median: {self.median()}")
+        body.append(f"STD (ddof=0): {self.max()}")
+        return body
+        
 
 @dataclass
 class Sampler:
@@ -147,9 +192,11 @@ class ResultManager:
         else:
             self.folder_path.mkdir()
         
-    def save_result(self, file_name: str, result: SamplerResult, *args, **kwargs):
-        data = result.as_csv(*args, **kwargs)
+    def save_result(self, file_name: str, result: SamplerResult, *args, save_summery=False, **kwargs):
+        data = result.get_csv(*args, **kwargs)
         self.save_csv(file_name, data)
+        if save_summery:
+            self.save_text(file_name, result.get_summery(print_log=False, *args, **kwargs))
     
     def save_csv(self, file_name: str, data: List[Dict[float, Any]]):
         headers = data[0].keys()
@@ -159,3 +206,9 @@ class ResultManager:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()  # Writes the column names
             writer.writerows(data)  # Writes all rows at once
+    
+    def save_text(self, file_name: str, data: str):
+        path = pathlib.Path(self.folder_path, file_name)
+        path = path if path.suffix == ".txt" else path.with_suffix(".txt")
+        with open(str(path), "w", newline="") as f:
+            f.write(data)
