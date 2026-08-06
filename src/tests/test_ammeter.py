@@ -11,17 +11,6 @@ from Ammeters.Entes_Ammeter import EntesAmmeter
 from Ammeters.Greenlee_Ammeter import GreenleeAmmeter
 
 
-@pytest.mark.parametrize("random_numbers", [1,2,3,4])
-@pytest.mark.parametrize("ammeter", [CircutorAmmeter], indirect=True)
-def test_try_run(configs, random_numbers, ammeter):
-    assert random_numbers != 2
-    if random_numbers == 1:
-        logging.info(configs)
-    logging.info(ammeter.measure_current())
-    time.sleep(1)
-
-# @pytest.mark.parametrize("ammeter", [pytest.param(GreenleeAmmeter, marks=pytest.mark.circutor)], indirect=True)
-
 @pytest.mark.stability
 @pytest.mark.circutor
 @pytest.mark.parametrize("time_to_run", [10, 30])
@@ -34,6 +23,7 @@ def test_circutor_stability(result_manager, make_sampler, time_to_run, ammeter):
 
 @pytest.mark.stability
 @pytest.mark.entes
+@pytest.mark.parametrize("time_to_run", [10, 30])
 @pytest.mark.parametrize("ammeter", [EntesAmmeter], indirect=True)
 def test_entes_stability(result_manager, make_sampler, time_to_run, ammeter):
     _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
@@ -78,8 +68,12 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     
     # Run Sample
     results = sampler.sample_many(targets, NumericSamplerResult)
+    summaries = []
     for ammeter_name, res in results.items():
+        res.sample_name = ammeter_name
         result_manager.save_result(f"{ammeter_name}Result", res)
+        summaries.append(res.get_summery())
+    result_manager.save_text("summery", "\n\n".join(summaries))
     
     # Order results
     
@@ -91,4 +85,5 @@ def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager
     res = sampler.sample(ammeter.measure_current, result_class=NumericSamplerResult)
     logging.info(res)
     result_manager.save_result(file_name, res)
+    result_manager.save_text(file_name, res.get_summery())
     
