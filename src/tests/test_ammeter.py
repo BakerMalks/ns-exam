@@ -26,9 +26,8 @@ def test_try_run(configs, random_numbers, ammeter):
 @pytest.mark.circutor
 @pytest.mark.parametrize("time_to_run", [10, 30])
 @pytest.mark.parametrize("ammeter", [CircutorAmmeter], indirect=True)
-def test_circutor_stability(request, result_manager, make_sampler, time_to_run, ammeter):
-    test_name = request.node.name
-    _test_single_ammeter_stability(file_name=test_name, result_manager=result_manager,
+def test_circutor_stability(result_manager, make_sampler, time_to_run, ammeter):
+    _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
                                    make_sampler=make_sampler, time_to_run=time_to_run,
                                    ammeter=ammeter)
 
@@ -36,9 +35,8 @@ def test_circutor_stability(request, result_manager, make_sampler, time_to_run, 
 @pytest.mark.stability
 @pytest.mark.entes
 @pytest.mark.parametrize("ammeter", [EntesAmmeter], indirect=True)
-def test_entes_stability(request, result_manager, make_sampler, time_to_run, ammeter):
-    test_name = request.node.name
-    _test_single_ammeter_stability(file_name=test_name, result_manager=result_manager,
+def test_entes_stability(result_manager, make_sampler, time_to_run, ammeter):
+    _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
                                    make_sampler=make_sampler, time_to_run=time_to_run,
                                    ammeter=ammeter)
 
@@ -47,9 +45,8 @@ def test_entes_stability(request, result_manager, make_sampler, time_to_run, amm
 @pytest.mark.greenlee
 @pytest.mark.parametrize("time_to_run", [10, 30])
 @pytest.mark.parametrize("ammeter", [GreenleeAmmeter], indirect=True)
-def test_greenlee_stability(request, result_manager, make_sampler, time_to_run, ammeter):
-    test_name = request.node.name
-    _test_single_ammeter_stability(file_name=test_name, result_manager=result_manager,
+def test_greenlee_stability(result_manager, make_sampler, time_to_run, ammeter):
+    _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
                                    make_sampler=make_sampler, time_to_run=time_to_run,
                                    ammeter=ammeter)
 
@@ -57,9 +54,8 @@ def test_greenlee_stability(request, result_manager, make_sampler, time_to_run, 
 @pytest.mark.stability
 @pytest.mark.parametrize("time_to_run", [10, 30])
 @pytest.mark.parametrize("ammeter", [CircutorAmmeter, EntesAmmeter, GreenleeAmmeter], indirect=True)
-def test_ammeter_stability(request, result_manager, make_sampler, time_to_run, ammeter):
-    test_name = request.node.name
-    _test_single_ammeter_stability(file_name=test_name, result_manager=result_manager,
+def test_ammeter_stability(result_manager, make_sampler, time_to_run, ammeter):
+    _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
                                    make_sampler=make_sampler, time_to_run=time_to_run,
                                    ammeter=ammeter)
 
@@ -72,8 +68,7 @@ def test_ammeter_stability(request, result_manager, make_sampler, time_to_run, a
                                       [CircutorAmmeter, EntesAmmeter, GreenleeAmmeter]],
                          indirect=True, ids=lambda classes: "-".join(cls.name for cls in classes)
                          )
-def test_ammeters_at_same_time_stability(request, result_manager, make_sampler, time_to_run, ammeters):
-    test_name = request.node.name
+def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_run, ammeters):
     sampler = make_sampler(total_duration_seconds=time_to_run)
     
     # Build target
@@ -84,7 +79,7 @@ def test_ammeters_at_same_time_stability(request, result_manager, make_sampler, 
     # Run Sample
     results = sampler.sample_many(targets, NumericSamplerResult)
     for ammeter_name, res in results.items():
-        result_manager.save_result(f"{test_name}_{ammeter_name}", res)
+        result_manager.save_result(f"{ammeter_name}Result", res)
     
     # Order results
     

@@ -6,11 +6,8 @@ import logging
 
 import numpy as np
 
-from datetime import datetime
 from typing import Any, Callable, Dict, List, Tuple, Type, TypeVar, Union
 from dataclasses import dataclass, field
-
-from src.utils.logger import TIME_FORMAT
 
 T = TypeVar("T")
 MAX_SAMPLEING_FREQUENCY = 0.001
@@ -184,13 +181,28 @@ class Sampler:
 
 class ResultManager:
     def __init__(self, result_folder_path: Union[str, pathlib.Path] = "."):  # can also write str | pathlib.Path in ptrhon 3.10+
-        now = datetime.now()  # can use utc to avoid multi timezone 
-        formatted_time = now.strftime(TIME_FORMAT)
-        self.folder_path: pathlib.Path = pathlib.Path(result_folder_path, formatted_time)
-        if self.folder_path.exists():
+        self.result_folder_path: pathlib.Path = pathlib.Path(result_folder_path,)
+        self._sub_folder: pathlib.Path = pathlib.Path(".",)
+        if self.result_folder_path.exists():
             pass  # maybe add error here
         else:
-            self.folder_path.mkdir()
+            self.result_folder_path.mkdir()
+    
+    @property
+    def sub_folder(self) -> pathlib.Path:
+        return self._sub_folder
+    
+    @property
+    def save_path(self) -> pathlib.Path:
+        return pathlib.Path(self.result_folder_path, self.sub_folder)
+    
+    @sub_folder.setter
+    def sub_folder(self, path):
+        self._sub_folder = pathlib.Path(path, )
+        self.result_folder_path.mkdir(exist_ok=True)
+    
+    def reset_sub_folder(self):
+        self.sub_folder = "."
         
     def save_result(self, file_name: str, result: SamplerResult, *args, save_summery=False, **kwargs):
         data = result.get_csv(*args, **kwargs)
@@ -200,7 +212,7 @@ class ResultManager:
     
     def save_csv(self, file_name: str, data: List[Dict[float, Any]]):
         headers = data[0].keys()
-        path = pathlib.Path(self.folder_path, file_name)
+        path = pathlib.Path(self.save_path, file_name)
         path = path if path.suffix == ".csv" else path.with_suffix(".csv")
         with open(str(path), "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=headers)
@@ -208,7 +220,11 @@ class ResultManager:
             writer.writerows(data)  # Writes all rows at once
     
     def save_text(self, file_name: str, data: str):
-        path = pathlib.Path(self.folder_path, file_name)
-        path = path if path.suffix == ".txt" else path.with_suffix(".txt")
+        self.save_file(file_name=file_name, data=data, file_suffix=".txt")
+    
+    def save_file(self, file_name: str, data: str, file_suffix=""):
+        path =  pathlib.Path(self.save_path, file_name)
+        if file_suffix:
+            path = path if path.suffix == file_suffix else path.with_suffix(file_suffix)
         with open(str(path), "w", newline="") as f:
             f.write(data)
