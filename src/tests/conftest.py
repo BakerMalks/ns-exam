@@ -8,7 +8,7 @@ from datetime import datetime
 from src.utils.config import load_config
 from src.utils.Utils import AmmetterManager
 from src.utils.result_manager import ResultManager, Sampler
-from src.utils.logger import TestNameFilter, TIME_FORMAT
+from src.utils.logger import TIME_FORMAT
 from Ammeters.base_ammeter import AmmeterEmulatorBase
 
 BASE_FOLDER = pathlib.Path(".")
@@ -17,14 +17,31 @@ CONFIG_YAML = pathlib.Path(BASE_FOLDER, "config", "config.yaml")
 
 # Hooks
 
+def pytest_addoption(parser):
+    # Add a custom command-line flag
+    parser.addoption(
+        "--result-subfolder",
+        action="store",
+        default="",
+        help="Target environment for tests (e.g. dev, staging, prod)"
+    )
+
 def pytest_configure(config):
     configs = load_config(str(CONFIG_YAML))
     timestamp = datetime.now().strftime(TIME_FORMAT)
-    log_filename = f"pytest_{timestamp}.log"
     
+    # Set result folder
+    main_result_path = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"])
+    main_result_path.mkdir(exist_ok=True)
+    default_result_path = pathlib.Path(main_result_path, timestamp)
+    config.option.result_subfolder = pathlib.Path(main_result_path, config.option.result_subfolder) if config.option.result_subfolder else default_result_path
+    config.option.result_subfolder.mkdir(exist_ok=True)
+
     # Set the log file dynamically
-    path = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"], "logs")
-    config.option.log_file = str(pathlib.Path(path, ))
+    log_filename = "pytest.log"
+    log_path = pathlib.Path(config.option.result_subfolder, log_filename)
+    
+    config.option.log_file = str(pathlib.Path(log_path, ))
 
 
 # Session Scope
@@ -56,10 +73,8 @@ def ammeter_manager(configs) -> AmmetterManager:
 
 
 @pytest.fixture(scope="session")
-def result_manager(configs) -> ResultManager:
-    result_folder = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"])
-    result_folder.mkdir(exist_ok=True)
-    manager = ResultManager(result_folder)
+def result_manager(request) -> ResultManager:
+    manager = ResultManager(result_folder_path = request.config.option.result_subfolder)
     return manager
 
 # Module Scope

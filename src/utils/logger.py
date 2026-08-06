@@ -4,15 +4,6 @@ from datetime import datetime
 
 TIME_FORMAT = "%Y%m%d_%H%M%S"
 
-class TestNameFilter(logging.Filter):
-    """Overrides logger name with current pytest test name."""
-    def __init__(self, test_name: str):
-        super().__init__()
-        self.test_name = test_name
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        record.name = self.test_name  # Changes %(name)s in format strings
-        return True
 
 class TestLogger:
     def __init__(self, test_name: str):
