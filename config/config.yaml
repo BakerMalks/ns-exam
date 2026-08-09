@@ -16,7 +16,6 @@ ammeters:
    command: "MEASURE_CIRCUTOR -get_measurement -current"
 
 analysis:
-  statistical_metrics:
   visualization:
     enabled: false  # will show every plot (stop tests until plot is closed)
     plot_types: ["line", "scatter", "hist"]
