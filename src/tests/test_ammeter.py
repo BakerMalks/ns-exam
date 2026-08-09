@@ -69,12 +69,13 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     results = sampler.sample_many(targets, NumericSamplerResult)
     
     # Order results
-    summaries = []
+    summaries = {}
     for ammeter_name, res in results.items():
         res.sample_name = ammeter_name
         result_manager.save_result(f"{ammeter_name}Result", res)
-        summaries.append(res.get_summary())
-    result_manager.save_text("summary", "\n\n".join(summaries))
+        res.get_summary()  # logs the human readable summary
+        summaries[ammeter_name] = res.get_summary_dict()
+    result_manager.save_json("summary", summaries)
     
     # Plot
     title = " vs ".join([a.name.capitalize() for a in ammeters])
@@ -90,6 +91,6 @@ def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager
     logging.info(sampler)
     res = sampler.sample(ammeter.measure_current, result_class=NumericSamplerResult)
     logging.info(res)
-    result_manager.save_result(file_name, res)
-    result_manager.save_text(file_name, res.get_summary())
+    res.get_summary()  # logs the human readable summary
+    result_manager.save_result(file_name, res, save_summary=True)
     

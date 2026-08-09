@@ -3,6 +3,7 @@ import pathlib
 import csv
 import concurrent.futures
 import logging
+import json
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,13 +17,21 @@ T = TypeVar("T")
 MAX_SAMPLEING_FREQUENCY = 0.001
 
 
+def _json_default(value: Any) -> Any:
+    """Fallback encoder for values `json` cant serialize on its own.
+    """
+    if isinstance(value, np.generic):
+        return value.item()
+    return str(value)
+
+
 @dataclass
 class SamplerResult:
     samples: Dict[float, Any] = field(default_factory=dict)
     initiate_sample_timer: bool = True
     sample_name: str = ""
     _init_time: float = 0.0
-    
+
     def __post_init__(self):
         if self.initiate_sample_timer:
             self.start_timer()
@@ -46,27 +55,65 @@ class SamplerResult:
             split_literal (str, optional): the split between the summary lines. Defaults "" will mean '\n - '.
 
         Returns:
-            str: _description_
+            str: the summary as human readable text
         """
         summary_list = [self._get_summary_header()]
-        summary_list.extend(self._get_summary_body(add_sample_type))
+        summary_list.extend(
+            f"{self._get_summary_label(key)}: {self._format_summary_value(value)}"
+            for key, value in self._get_summary_body(add_sample_type).items()
+        )
         split_literal = split_literal if split_literal else '\n - '
         summary = split_literal.join(summary_list)
         if print_log:
             logging.info(summary)
         return summary
-        
-    def _get_summary_body(self, add_sample_type: bool = True) -> List[str]:
-        body = []
-        body.append(f"Sample count: {self.sample_count}")
+
+    def get_summary_json(self, print_log: bool = False, add_sample_type: bool = True, indent: Optional[int] = 2, *args, **kwargs) -> str:
+        """Same summary content as `get_summary`, serialized as JSON.
+
+        Args:
+            print_log (bool, optional): Log the summary. Defaults to False.
+            add_sample_type (bool, optional): Should include the type value of the sample (int / str / ...). Defaults to True.
+            indent (Optional[int], optional): `json.dumps` indent. Pass None for a single line. Defaults to 2.
+
+        Returns:
+            str: the summary as a JSON object
+        """
+        summary = json.dumps(self.get_summary_dict(add_sample_type), indent=indent, default=_json_default)
+        if print_log:
+            logging.info(summary)
+        return summary
+
+    def get_summary_dict(self, add_sample_type: bool = True, *args, **kwargs) -> Dict[str, Any]:
+        """The summary as structured data. Single source of truth for both summary formats.
+
+        Keys are machine friendly (snake_case), `get_summary` turns them into display
+        labels via `_get_summary_label`.
+        """
+        return {"sample_name": self.sample_name, **self._get_summary_body(add_sample_type)}
+
+    def _get_summary_body(self, add_sample_type: bool = True) -> Dict[str, Any]:
+        """Metric key -> value. Subclasses extend this to add their own metrics."""
+        body: Dict[str, Any] = {"sample_count": self.sample_count}
         if add_sample_type:
-            sample_types = set(str(type(value)) for value in self.samples.values())
-            body.append(f"""Sample types: {", ".join(sample_types)}""")
+            body["sample_types"] = sorted(set(str(type(value)) for value in self.samples.values()))
         return body
-            
+
     def _get_summary_header(self) -> str:
             return f"""Sample {self.sample_name + " " if self.sample_name else ""}Results:"""
-    
+
+    @staticmethod
+    def _get_summary_label(key: str) -> str:
+        """Display label for a summary key. `sample_count` -> `Sample count`."""
+        return key.replace("_", " ").capitalize()
+
+    @staticmethod
+    def _format_summary_value(value: Any) -> str:
+        """Renders one summary value for the text format."""
+        if isinstance(value, (list, tuple, set)):
+            return ", ".join(str(item) for item in value)
+        return str(value)
+
     @property
     def sample_count(self) -> int:
         return len(self.samples)
@@ -89,7 +136,7 @@ class SamplerResult:
 @dataclass
 class NumericSamplerResult(SamplerResult):
     samples: Dict[float, float] = field(default_factory=dict)
-    
+
     def max(self) -> float:
         return max(self.samples.values())
 
@@ -115,13 +162,13 @@ class NumericSamplerResult(SamplerResult):
         """
         return np.std(list(self.samples.values()), ddof=ddof)
    
-    def _get_summary_body(self, add_sample_type: bool = True) -> List[str]:
+    def _get_summary_body(self, add_sample_type: bool = True) -> Dict[str, Any]:
         body = super()._get_summary_body(add_sample_type)
-        body.append(f"Max: {self.max()}")
-        body.append(f"Min: {self.min()}")
-        body.append(f"Mean: {self.mean()}")
-        body.append(f"Median: {self.median()}")
-        body.append(f"STD (ddof=0): {self.std()}")
+        body["max"] = self.max()
+        body["min"] = self.min()
+        body["mean"] = self.mean()
+        body["median"] = self.median()
+        body["std_ddof0"] = self.std()
         return body
         
 
@@ -222,8 +269,12 @@ class ResultManager:
         csv_path = csv_path if csv_path.suffix == ".csv" else csv_path.with_suffix(".csv")
         result.get_data_frame(*args, **kwargs).to_csv(csv_path, index=False)
         if save_summary:
-            self.save_text(file_name, result.get_summary(print_log=False, *args, **kwargs))
-    
+            self.save_summary(file_name, result, *args, **kwargs)
+
+    def save_summary(self, file_name: str, result: SamplerResult, *args, **kwargs):
+        """Saves the result summary as a json file."""
+        self.save_json(file_name, result.get_summary_dict(*args, **kwargs))
+
     def save_csv(self, file_name: str, data: List[Dict[float, Any]]):
         headers = data[0].keys()
         path = pathlib.Path(self.save_path, file_name)
@@ -235,7 +286,12 @@ class ResultManager:
     
     def save_text(self, file_name: str, data: str):
         self.save_file(file_name=file_name, data=data, file_suffix=".txt")
-    
+
+    def save_json(self, file_name: str, data: Any, indent: Optional[int] = 2):
+        """Saves any json compatible object (dict / list / ...) as a json file."""
+        self.save_file(file_name=file_name, data=json.dumps(data, indent=indent, default=_json_default), file_suffix=".json")
+
+
     def save_file(self, file_name: str, data: str, file_suffix=""):
         path =  pathlib.Path(self.save_path, file_name)
         if file_suffix:
