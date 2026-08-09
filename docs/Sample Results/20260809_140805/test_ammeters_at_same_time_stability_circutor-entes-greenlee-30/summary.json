@@ -1,0 +1,38 @@
+{
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 147.22940310592315,
+    "min": 18.80858223168278,
+    "mean": 73.20761630271613,
+    "median": 70.14931026456495,
+    "std_ddof0": 36.31480253324044
+  },
+  "greenlee": {
+    "sample_name": "greenlee",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.593371574835976,
+    "min": 0.020249268459375344,
+    "mean": 0.14507280907963643,
+    "median": 0.08605022186637613,
+    "std_ddof0": 0.1468909189032522
+  },
+  "circutor": {
+    "sample_name": "circutor",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.06653551698532331,
+    "min": 0.009394629136995573,
+    "mean": 0.0335110887762072,
+    "median": 0.031790171228686354,
+    "std_ddof0": 0.016217823975966945
+  }
+}

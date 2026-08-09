@@ -1,0 +1,26 @@
+{
+  "circutor": {
+    "sample_name": "circutor",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.05821274272537541,
+    "min": 0.005629358949587098,
+    "mean": 0.02985308541792374,
+    "median": 0.03291878889712481,
+    "std_ddof0": 0.014799350859863176
+  },
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 178.3508681786509,
+    "min": 13.506290195478176,
+    "mean": 77.95871665344724,
+    "median": 79.9738147758384,
+    "std_ddof0": 38.434948497113595
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 123.20064347854458,
+    "min": 17.517515718539247,
+    "mean": 69.47248725696926,
+    "median": 73.96914712309966,
+    "std_ddof0": 31.984863805421455
+  },
+  "circutor": {
+    "sample_name": "circutor",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.04608695365155273,
+    "min": 0.01001893694761398,
+    "mean": 0.026965364551795483,
+    "median": 0.031363561932100374,
+    "std_ddof0": 0.01166653468633762
+  }
+}

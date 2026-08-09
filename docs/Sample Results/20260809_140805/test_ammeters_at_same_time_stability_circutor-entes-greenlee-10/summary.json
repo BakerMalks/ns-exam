@@ -1,0 +1,38 @@
+{
+  "circutor": {
+    "sample_name": "circutor",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.06386078625126602,
+    "min": 0.015179022941507875,
+    "mean": 0.03423251326287306,
+    "median": 0.0322182555418187,
+    "std_ddof0": 0.014639296995587076
+  },
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 147.6315598620444,
+    "min": 6.4287724488280045,
+    "mean": 69.40473700634769,
+    "median": 72.64641552193967,
+    "std_ddof0": 44.87885891254176
+  },
+  "greenlee": {
+    "sample_name": "greenlee",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 1.3469693398028442,
+    "min": 0.019330136159113755,
+    "mean": 0.2715597926626715,
+    "median": 0.18541304264737782,
+    "std_ddof0": 0.36816280919387284
+  }
+}

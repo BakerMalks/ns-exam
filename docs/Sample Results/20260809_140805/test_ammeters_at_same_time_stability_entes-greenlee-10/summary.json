@@ -1,0 +1,26 @@
+{
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 105.76025342827349,
+    "min": 8.536423977112287,
+    "mean": 65.425769677602,
+    "median": 74.58774407028552,
+    "std_ddof0": 30.740373156823818
+  },
+  "greenlee": {
+    "sample_name": "greenlee",
+    "sample_count": 10,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 0.39775975311999534,
+    "min": 0.037871958630283066,
+    "mean": 0.16422686427308214,
+    "median": 0.16252382185845324,
+    "std_ddof0": 0.09702366233739634
+  }
+}

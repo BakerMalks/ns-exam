@@ -1,0 +1,26 @@
+{
+  "greenlee": {
+    "sample_name": "greenlee",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 1.2777936012333064,
+    "min": 0.020410290846400753,
+    "mean": 0.16594114953148037,
+    "median": 0.1040314187772381,
+    "std_ddof0": 0.22774098941013418
+  },
+  "entes": {
+    "sample_name": "entes",
+    "sample_count": 30,
+    "sample_types": [
+      "<class 'float'>"
+    ],
+    "max": 159.56052067025453,
+    "min": 6.494327261247594,
+    "mean": 70.20318297947261,
+    "median": 51.090527198888815,
+    "std_ddof0": 43.92831734790552
+  }
+}
