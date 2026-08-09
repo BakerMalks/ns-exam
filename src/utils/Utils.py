@@ -33,9 +33,8 @@ class AmmetterManager:
         # Wait until port is actually listening
         timeout = 5.0
         start = time.perf_counter()
-        time.sleep(1)
         while not is_port_open("localhost", port):
-            if time.time() - start > timeout:
+            if time.perf_counter() - start > timeout:
                 raise RuntimeError(
                     f"Timed out starting '{ammeter_type}'"
                 )
