@@ -48,6 +48,13 @@ This project provides emulators for different types of ammeters: Greenlee, ENTES
 - **Measurement Logic**: Calculates current using voltage values (0.1V - 1.0V) over a number of samples and a random time step (0.001s - 0.01s).
 - **Measurement method** : Rogowski Coil Integration: I = ∫V dt
 
+# Installed Python Libraries
+
+numpy, matplotlib, pandas, seaborn - used for data visualisation
+pyyaml - For reading yaml configuration file
+scipy - math, statistical testing for numpy
+pytest - For testing interface 
+
 ## Usage
 
 To start the virtual environment, run the `setup_env.py` script:

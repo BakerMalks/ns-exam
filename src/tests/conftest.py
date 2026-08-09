@@ -174,4 +174,5 @@ def global_teardown(request):
     yield
     if request.config.getoption("--compact-result"):
         full_res_path: pathlib.Path = request.config.option.result_subfolder
-        shutil.make_archive(full_res_path.name, 'zip', full_res_path.parent)
+        logging.info(f"Saving result in {full_res_path}.zip")
+        shutil.make_archive(base_name=str(full_res_path), format='zip', root_dir=str(full_res_path), )
