@@ -80,8 +80,8 @@ def test_ammeter_stability(result_manager, make_sampler, time_to_run, ammeter, s
 @pytest.mark.parametrize("measurements_count", [100])
 @pytest.mark.parametrize("sampling_frequency_hz", [1, 20])
 @pytest.mark.parametrize("ammeter", [CircutorAmmeter, EntesAmmeter, GreenleeAmmeter], indirect=True)
-def test_ammeter_stability_by_measurements_count(result_manager, make_sampler, time_to_run, ammeter, sampling_frequency_hz):
-    sampling_kwargs = {"total_duration_seconds": time_to_run,
+def test_ammeter_stability_by_measurements_count(result_manager, make_sampler, measurements_count, ammeter, sampling_frequency_hz):
+    sampling_kwargs = {"measurements_count": measurements_count,
                        "sampling_frequency_hz": sampling_frequency_hz}
     res = _test_single_ammeter_stability(file_name="ammeter_result",
                                          result_manager=result_manager,
@@ -131,6 +131,7 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     result_manager.plot_results(*results.values(), title=title, kind="scatter", value_label=value_label)
     result_manager.plot_results(*results.values(), title=title, kind="line", value_label=value_label)
     result_manager.plot_results(*results.values(), title=title, kind="hist", value_label=value_label)
+    #TODO 5 -Accuracy Assessment. Identify most reliable measurement method
 
 
 def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager,
