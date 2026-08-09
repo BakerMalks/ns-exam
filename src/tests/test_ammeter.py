@@ -42,11 +42,19 @@ def test_greenlee_stability(result_manager, make_sampler, time_to_run, ammeter):
 
 @pytest.mark.stability
 @pytest.mark.parametrize("time_to_run", [10, 30])
+@pytest.mark.parametrize("sampling_frequency_hz", [1, 30])
 @pytest.mark.parametrize("ammeter", [CircutorAmmeter, EntesAmmeter, GreenleeAmmeter], indirect=True)
-def test_ammeter_stability(result_manager, make_sampler, time_to_run, ammeter):
-    _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
-                                   make_sampler=make_sampler, time_to_run=time_to_run,
-                                   ammeter=ammeter)
+def test_ammeter_stability(result_manager, make_sampler, time_to_run, ammeter, sampling_frequency_hz):
+    res = _test_single_ammeter_stability(file_name="ammeter_result", result_manager=result_manager,
+                                         make_sampler=make_sampler, time_to_run=time_to_run,
+                                         ammeter=ammeter, sampling_frequency_hz=sampling_frequency_hz)
+    result_manager.plot_results
+    # Plot
+    title = ammeter.name.capitalize()
+    value_label = "Current[A]"
+    result_manager.plot_results(res, title=title, kind="scatter", value_label=value_label)
+    result_manager.plot_results(res, title=title, kind="line", value_label=value_label)
+    result_manager.plot_results(res, title=title, kind="hist", value_label=value_label)
 
 
 @pytest.mark.stability
@@ -85,12 +93,14 @@ def test_ammeters_at_same_time_stability(result_manager, make_sampler, time_to_r
     result_manager.plot_results(*results.values(), title=title, kind="hist", value_label=value_label)
 
 
-def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager, make_sampler: Callable[..., Sampler], time_to_run: int, ammeter: AmmeterEmulatorBase):
-    # ammeter.measure_current()
-    sampler = make_sampler(total_duration_seconds=time_to_run)
+def _test_single_ammeter_stability(file_name: str, result_manager: ResultManager, make_sampler: Callable[..., Sampler],
+                                   time_to_run: int, ammeter: AmmeterEmulatorBase,
+                                   sampling_frequency_hz: int = 1) -> NumericSamplerResult:
+    sampler = make_sampler(total_duration_seconds=time_to_run, sampling_frequency_hz=sampling_frequency_hz)
     logging.info(sampler)
-    res = sampler.sample(ammeter.measure_current, result_class=NumericSamplerResult)
+    res: NumericSamplerResult = sampler.sample(ammeter.measure_current, result_class=NumericSamplerResult)
     logging.info(res)
     res.get_summary()  # logs the human readable summary
     result_manager.save_result(file_name, res, save_summary=True)
+    return res
     

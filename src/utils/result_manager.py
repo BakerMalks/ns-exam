@@ -16,6 +16,9 @@ from dataclasses import dataclass, field
 T = TypeVar("T")
 R = TypeVar("R", bound="SamplerResult")  # the concrete SamplerResult subclass a sample was collected into
 MAX_SAMPLEING_FREQUENCY = 0.001
+PlotKind = Literal["line", "scatter", "hist"]
+DEFAULT_FIGURE_SIZE = [8, 5]
+DEFAULT_PLOT_KIND: PlotKind = "scatter"
 
 
 def _json_default(value: Any) -> Any:
@@ -242,6 +245,10 @@ class ResultManager:
         self.result_folder_path: pathlib.Path = pathlib.Path(result_folder_path,)
         self._analysis_config = analysis_config if analysis_config is not None else {}
         self._default_figure: Dict = self._analysis_config.get("visualization", {}).get("default_figure", {})
+        # The yaml `default_figure` block mixes figure geometry with our own plot defaults,
+        # so map it to real matplotlib kwargs instead of forwarding the raw dict to plt.subplots.
+        self._default_fig_kwargs: Dict = {"figsize": self._default_figure.get("figure_size", DEFAULT_FIGURE_SIZE)}
+        self._default_plot_kind: PlotKind = self._default_figure.get("default_plot_type", DEFAULT_PLOT_KIND)
         self._sub_folder: pathlib.Path = pathlib.Path(".",)
         self.result_folder_path.mkdir(exist_ok=True, parents=True)
     
@@ -299,15 +306,15 @@ class ResultManager:
 
     def plot_results(self, *results: NumericSamplerResult,
                      title: Optional[str] = None,
-                     kind: Optional[Literal["line", "scatter", "hist"]] = None,
+                     kind: Optional[PlotKind] = None,
                      by_index: bool = False, fig_kwargs: Optional[Dict] = None,
                      value_label: str = "Value[#]", 
                      show_plot: bool = False,
                      save_plot: bool = True,
                      **kwargs):
         # fig
-        fig_kwargs = fig_kwargs if fig_kwargs else (self._default_figure if self._default_figure else {"figsize": [8, 5]})
-        kind = kind if kind else self._default_figure.get("default_plot_type", "scatter")
+        fig_kwargs = fig_kwargs if fig_kwargs else self._default_fig_kwargs
+        kind = kind if kind else self._default_plot_kind
         fig, ax = plt.subplots(**fig_kwargs)
         col_name = ""
         for i, result in enumerate(results):
