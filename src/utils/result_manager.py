@@ -14,6 +14,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Ty
 from dataclasses import dataclass, field
 
 T = TypeVar("T")
+R = TypeVar("R", bound="SamplerResult")  # the concrete SamplerResult subclass a sample was collected into
 MAX_SAMPLEING_FREQUENCY = 0.001
 
 
@@ -183,7 +184,7 @@ class Sampler:
         if self.sampling_frequency_hz < 0: 
             self.sampling_frequency_hz = MAX_SAMPLEING_FREQUENCY
     
-    def sample(self, sample_function: Callable[..., T], *args, result_class: type[SamplerResult] = SamplerResult, **kwargs) -> SamplerResult:
+    def sample(self, sample_function: Callable[..., T], *args, result_class: Type[R] = SamplerResult, **kwargs) -> R:
         samples = result_class()
         target_period = 1.0 / self.sampling_frequency_hz
         if self.measurements_count > 0:
@@ -211,8 +212,8 @@ class Sampler:
     def sample_many(
         self,
         targets: Dict[str, Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]],
-        result_class: Type[SamplerResult] = SamplerResult
-    ) -> Dict[str, SamplerResult]:
+        result_class: Type[R] = SamplerResult
+    ) -> Dict[str, R]:
         """
         Samples multiple functions concurrently using a thread pool.
         
@@ -222,7 +223,7 @@ class Sampler:
            "sensor_2": (read_func_2, (), {})
         }
         """
-        results: Dict[str, SamplerResult] = {}
+        results: Dict[str, R] = {}
         
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(targets)) as executor:
             future_to_name = {}
