@@ -242,10 +242,7 @@ class ResultManager:
         self._analysis_config = analysis_config if analysis_config is not None else {}
         self._default_figure: Dict = self._analysis_config.get("visualization", {}).get("default_figure", {})
         self._sub_folder: pathlib.Path = pathlib.Path(".",)
-        if self.result_folder_path.exists():
-            pass  # maybe add error here
-        else:
-            self.result_folder_path.mkdir()
+        self.result_folder_path.mkdir(exist_ok=True, parents=True)
     
     @property
     def sub_folder(self) -> pathlib.Path:

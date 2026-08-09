@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 
@@ -15,6 +16,7 @@ def run_emulator(emulator: AmmeterEmulatorBase):
     
 
 if __name__ == "__main__":
+    logging.basicConfig()
     # Start each ammeter in a separate thread
     config = load_config("./config/config.yaml")
     greenlee = GreenleeAmmeter(config["ammeters"]["greenlee"]["port"])

@@ -46,7 +46,7 @@ def pytest_configure(config):
     default_result_path = pathlib.Path(main_result_path, timestamp)
     res_option = config.getoption("--result-subfolder")
     config.option.result_subfolder = pathlib.Path(main_result_path, res_option) if res_option else default_result_path
-    config.option.result_subfolder.mkdir(exist_ok=True)
+    config.option.result_subfolder.mkdir(exist_ok=True, parents=True)
 
     # Set the log file dynamically
     log_filename = "pytest.log"
@@ -84,8 +84,8 @@ def ammeter_manager(configs) -> AmmetterManager:
 
 
 @pytest.fixture(scope="session")
-def result_manager(request) -> ResultManager:
-    manager = ResultManager(result_folder_path = request.config.option.result_subfolder)
+def result_manager(request, configs) -> ResultManager:
+    manager = ResultManager(result_folder_path = request.config.option.result_subfolder, analysis_config=configs["analysis"])
     return manager
 
 # Module Scope

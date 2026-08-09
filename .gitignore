@@ -1,7 +1,8 @@
 *.pyc
-*.pyc
 *.log
 *.csv
 __pycache__/
 .venv/
 results/
+.idea/
+.pytest_cache/
