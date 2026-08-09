@@ -7,7 +7,7 @@ from typing import Callable, Dict, List
 from datetime import datetime
 
 from src.utils.config import load_config
-from src.utils.Utils import AmmetterManager
+from src.utils.utils import AmmetterManager
 from src.utils.result_manager import ResultManager, Sampler
 from src.utils.logger import TIME_FORMAT
 from Ammeters.base_ammeter import AmmeterEmulatorBase

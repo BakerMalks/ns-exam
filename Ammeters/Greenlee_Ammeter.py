@@ -2,7 +2,7 @@ import logging
 
 from typing import ClassVar
 from Ammeters.base_ammeter import AmmeterEmulatorBase
-from src.utils.Utils import generate_random_float
+from src.utils.utils import generate_random_float
 
 
 class GreenleeAmmeter(AmmeterEmulatorBase):
