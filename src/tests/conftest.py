@@ -1,6 +1,7 @@
 import pytest
 import pathlib
 import logging
+import shutil
 
 from typing import Callable, Dict, List
 from datetime import datetime
@@ -18,11 +19,20 @@ CONFIG_YAML = pathlib.Path(BASE_FOLDER, "config", "config.yaml")
 # Hooks
 
 def pytest_addoption(parser):
+    # Add a custom group
+    result_group = parser.getgroup("Result options", "Settings for result folder")
+     
     # Add a custom command-line flag
-    parser.addoption(
-        "--result-subfolder",
+    result_group.addoption(
+        "--result-subfolder", "--rsf",
         action="store",
         default="",
+        help="Target environment for tests (e.g. dev, staging, prod)"
+    )
+    result_group.addoption(
+        "--compact-result", "--cr",
+        action="store_true",
+        default=False,
         help="Target environment for tests (e.g. dev, staging, prod)"
     )
 
@@ -34,7 +44,8 @@ def pytest_configure(config):
     main_result_path = pathlib.Path(BASE_FOLDER, configs["result_management"]["folder_name"])
     main_result_path.mkdir(exist_ok=True)
     default_result_path = pathlib.Path(main_result_path, timestamp)
-    config.option.result_subfolder = pathlib.Path(main_result_path, config.option.result_subfolder) if config.option.result_subfolder else default_result_path
+    res_option = config.getoption("--result-subfolder")
+    config.option.result_subfolder = pathlib.Path(main_result_path, res_option) if res_option else default_result_path
     config.option.result_subfolder.mkdir(exist_ok=True)
 
     # Set the log file dynamically
@@ -155,3 +166,12 @@ def override_result_subfolder_with_test_name(request, result_manager: ResultMana
     result_manager.sub_folder = folder_name
     yield
     result_manager.reset_sub_folder()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def global_teardown(request):
+    # Setup code can go here (runs before any tests start)
+    yield
+    if request.config.getoption("--compact-result"):
+        full_res_path: pathlib.Path = request.config.option.result_subfolder
+        shutil.make_archive(full_res_path.name, 'zip', full_res_path.parent)

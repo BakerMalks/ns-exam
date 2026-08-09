@@ -103,8 +103,16 @@ pytest -s src\\tests\\test_ammeter.py::test_run_as_python
 ```
 
 To Change Log and result subfolder
-To Run a single test:
 ```sh
 pytest -s --result-subfolder MyRun
+# Or
+pytest -s --rsf MyRun
 # will be saved at a folder named MyRun in the "result_management:folder_name" folder from yaml
+```
+
+To comprase result folder after test
+```sh
+pytest -s --compact-result MyRun
+# Or
+pytest -s --cr
 ```
