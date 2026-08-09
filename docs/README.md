@@ -58,6 +58,8 @@ config/
   config.yaml            Sampling, ammeter, analysis and result settings
 docs/                    Deliverable's Folder
   README.md              This document
+  Design_Decisions.md    Design decisions, and the fixes made to the supplied code
+  Sample Results/        A full committed test run, plus the same run as a zip
 src/
   tests/
     conftest.py          Fixtures, CLI options, result/log folder wiring
@@ -70,6 +72,7 @@ src/
 Exam/                    The original exercise specification
 main.py                  Starts the emulators and takes one reading from each
 pytest.ini               Log format, testpaths, marker registry
+requirements.txt         Python dependencies
 setup_env.py             Creates .venv and installs requirements
 ```
 
