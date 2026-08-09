@@ -100,7 +100,9 @@ class NumericSamplerResult(SamplerResult):
         return sum(self.samples.values()) / self.sample_count
 
     def median(self) -> float:
-        return list(self.samples.values())[self.sample_count // 2]
+        l = list(self.samples.values())
+        l.sort()
+        return l[self.sample_count // 2]
 
     def std(self, ddof: float = 0) -> float:
         """Standard deviation 
@@ -119,7 +121,7 @@ class NumericSamplerResult(SamplerResult):
         body.append(f"Min: {self.min()}")
         body.append(f"Mean: {self.mean()}")
         body.append(f"Median: {self.median()}")
-        body.append(f"STD (ddof=0): {self.max()}")
+        body.append(f"STD (ddof=0): {self.std()}")
         return body
         
 
